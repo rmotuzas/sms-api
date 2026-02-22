@@ -1,0 +1,17 @@
+[Unit]
+Description=SMS API Service
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/sms-api
+ExecStart=/usr/bin/python3 /opt/sms-api/app.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=sms-api
+
+[Install]
+WantedBy=multi-user.target

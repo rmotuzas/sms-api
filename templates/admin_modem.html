@@ -1,0 +1,76 @@
+{% extends "admin_base.html" %}
+{% block title %}Modemas — SMS API Admin{% endblock %}
+{% block page_title %}Modemo statusas{% endblock %}
+
+{% block content %}
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="data-table">
+      <div class="table-header">
+        <h6><i class="bi bi-router me-2"></i>ZTE WCDMA modemas</h6>
+        <span class="badge rounded-pill {{ 'badge-active' if modem else 'badge-inactive' }}">
+          {{ 'Online' if modem else 'Offline' }}
+        </span>
+      </div>
+      <div class="p-3">
+        {% if modem %}
+        <table class="table table-sm">
+          <tbody>
+            <tr><td class="text-muted small">Operatorius</td><td class="fw-600 small">{{ modem.operator }}</td></tr>
+            <tr><td class="text-muted small">Tinklo tipas</td><td class="fw-600 small">{{ modem.network_type }}</td></tr>
+            <tr><td class="text-muted small">Būsena</td><td><span class="badge badge-active rounded-pill">{{ modem.state }}</span></td></tr>
+            <tr><td class="text-muted small">Signalas</td>
+              <td>
+                {% for i in range(5) %}
+                  <i class="bi bi-reception-4" style="color:{{ '#22c55e' if i < modem.signal_bars|int else '#e2e8f0' }}"></i>
+                {% endfor %}
+                <span class="small text-muted ms-1">{{ modem.signal_bars }}/5</span>
+              </td>
+            </tr>
+            {% if modem.rssi %}<tr><td class="text-muted small">RSSI</td><td class="small">{{ modem.rssi }} dBm</td></tr>{% endif %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-4">
+          <i class="bi bi-exclamation-circle fs-2 text-danger d-block mb-2"></i>
+          <div class="fw-600">Modemas nepasiekiamas</div>
+          <div class="small text-muted mt-1">Patikrinkite ar 192.168.0.1 pasiekiamas</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="data-table">
+      <div class="table-header">
+        <h6><i class="bi bi-send me-2"></i>Greitas SMS testas</h6>
+      </div>
+      <div class="p-3">
+        <form method="POST" action="/admin/modem/test-sms">
+          <div class="mb-3">
+            <label class="form-label small fw-600">Telefono numeris</label>
+            <input type="text" name="phone" class="form-control form-control-sm" placeholder="+37060000000" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label small fw-600">Žinutė</label>
+            <textarea name="message" class="form-control form-control-sm" rows="3" placeholder="Testas iš SMS API 🦅" required></textarea>
+          </div>
+          <button type="submit" class="btn btn-sm w-100" style="background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-weight:600">
+            <i class="bi bi-send me-1"></i>Siųsti testinį SMS
+          </button>
+        </form>
+        {% if test_result %}
+        <div class="alert {{ 'alert-success' if test_result.success else 'alert-danger' }} mt-3 mb-0 small">
+          {% if test_result.success %}
+            <i class="bi bi-check-circle me-1"></i>SMS išsiųstas sėkmingai!
+          {% else %}
+            <i class="bi bi-x-circle me-1"></i>Klaida: {{ test_result.error }}
+          {% endif %}
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

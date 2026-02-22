@@ -1,0 +1,28 @@
+# Duomenų bazė ir slaptažodžiai
+tokens.db
+admin.conf
+.secret_key
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+.env
+
+# Logs
+*.log
+*.log.*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

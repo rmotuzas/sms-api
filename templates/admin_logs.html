@@ -1,0 +1,83 @@
+{% extends "admin_base.html" %}
+{% block title %}SMS Žurnalas — SMS API Admin{% endblock %}
+{% block page_title %}SMS Žurnalas{% endblock %}
+
+{% block content %}
+<div class="data-table">
+  <div class="table-header">
+    <h6><i class="bi bi-journal-text me-2"></i>SMS istorija</h6>
+    <div class="d-flex gap-2">
+      <form method="GET" class="d-flex gap-2">
+        <select name="token_id" class="form-select form-select-sm" style="min-width:160px" onchange="this.form.submit()">
+          <option value="">Visi tokenai</option>
+          {% for t in tokens %}
+          <option value="{{ t.id }}" {{ 'selected' if selected_token == t.id|string }}>{{ t.name }}</option>
+          {% endfor %}
+        </select>
+        <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="">Visi statusai</option>
+          <option value="sent" {{ 'selected' if selected_status == 'sent' }}>Išsiųsti</option>
+          <option value="failed" {{ 'selected' if selected_status == 'failed' }}>Nepavykę</option>
+        </select>
+      </form>
+    </div>
+  </div>
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Gavėjas</th>
+          <th>Žinutė</th>
+          <th>Tokenas</th>
+          <th>Statusas</th>
+          <th>Data / laikas</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sms in logs %}
+        <tr>
+          <td class="text-muted small">{{ sms.id }}</td>
+          <td class="font-monospace small fw-600">{{ sms.recipient }}</td>
+          <td class="small" style="max-width:280px">
+            <span class="d-block text-truncate" title="{{ sms.message }}">{{ sms.message }}</span>
+          </td>
+          <td><span class="badge bg-light text-dark small">{{ sms.token_name or '—' }}</span></td>
+          <td>
+            <span class="badge rounded-pill {{ 'badge-active' if sms.status == 'sent' else 'badge-inactive' }}">
+              {% if sms.status == 'sent' %}<i class="bi bi-check me-1"></i>Išsiųsta
+              {% else %}<i class="bi bi-x me-1"></i>Nepavyko{% endif %}
+            </span>
+          </td>
+          <td class="text-muted small">{{ sms.sent_at[:16] }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" class="text-center text-muted py-5">
+          <i class="bi bi-inbox fs-3 d-block mb-2"></i>Nėra įrašų
+        </td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% if total > per_page %}
+  <div class="p-3 border-top d-flex align-items-center justify-content-between">
+    <span class="small text-muted">{{ total }} įrašų viso</span>
+    <nav>
+      <ul class="pagination pagination-sm mb-0">
+        {% if page > 1 %}
+        <li class="page-item"><a class="page-link" href="?page={{ page-1 }}&token_id={{ selected_token }}&status={{ selected_status }}">‹</a></li>
+        {% endif %}
+        {% for p in range(1, (total // per_page) + 2) %}
+        <li class="page-item {{ 'active' if p == page }}">
+          <a class="page-link" href="?page={{ p }}&token_id={{ selected_token }}&status={{ selected_status }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+        {% if page * per_page < total %}
+        <li class="page-item"><a class="page-link" href="?page={{ page+1 }}&token_id={{ selected_token }}&status={{ selected_status }}">›</a></li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
